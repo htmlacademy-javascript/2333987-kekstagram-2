@@ -11,10 +11,15 @@ export const sortByMostDiscussed = (items) => items.slice().sort((photoFirst, ph
 export const showFilter = () => filterSectionElement.classList.remove('img-filters--inactive');
 
 export const changeFilter = (renderGallery, pictures) => {
-  const buttons = document.querySelectorAll('.img-filters__button');
+  const filterFormElement = document.querySelector('.img-filters__form');
+
+  if (!filterFormElement) {
+    return;
+  }
 
   const debouncedRenderGallery = debounce((targetId) => {
     try {
+
       document.querySelectorAll('.picture').forEach((pic) => pic.remove());
 
       if (targetId === 'filter-default') {
@@ -25,22 +30,27 @@ export const changeFilter = (renderGallery, pictures) => {
         renderGallery(sortByMostDiscussed(pictures));
       }
     } catch (error) {
-      // Оставил комментарий, чтобы не ругался ESLint
+      // комментарий, чтобы не обидеть ESLint
     }
   }, 500);
 
-  buttons.forEach((button) => {
-    button.addEventListener('click', (evt) => {
+  filterFormElement.addEventListener('click', (evt) => {
 
-      const currentActive = document.querySelector(`.${ACTIVE_FILTER}`);
-      if (currentActive) {
-        currentActive.classList.remove(ACTIVE_FILTER);
-      }
+    if (!evt.target.classList.contains('img-filters__button')) {
+      return;
+    }
 
-      evt.currentTarget.classList.add(ACTIVE_FILTER);
+    if (evt.target.classList.contains(ACTIVE_FILTER)) {
+      return;
+    }
 
-      debouncedRenderGallery(evt.currentTarget.id);
-    });
+    const currentActive = filterFormElement.querySelector(`.${ACTIVE_FILTER}`);
+    if (currentActive) {
+      currentActive.classList.remove(ACTIVE_FILTER);
+    }
+    evt.target.classList.add(ACTIVE_FILTER);
+
+    debouncedRenderGallery(evt.target.id);
   });
 };
 
