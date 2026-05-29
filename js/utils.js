@@ -1,19 +1,5 @@
 const ALERT_SHOW_TIME = 5000;
 
-const alertStyles = {
-  zIndex : '100',
-  position : 'absolute',
-  left : '0',
-  top : '0',
-  right : '0',
-  padding : '10px 3px',
-  fontSize : '30px',
-  lineHeight : '36px',
-  textAlign : 'center',
-  backgroundColor : '#232321',
-  color: '#ffffff',
-};
-
 export const checkLength = (array, maxLength) => array.length <= maxLength;
 
 export const checkRepeats = (array) => {
@@ -28,16 +14,19 @@ export const isEnterKey = (evt) => evt.key === 'Enter';
 
 export const removeLastCharacter = (string) => string ? string.slice(0, -1) : string;
 
-export const showAlert = (message) => {
-  const alertContainerElement = document.createElement('div');
-  Object.assign(alertContainerElement.style, alertStyles);
-  alertContainerElement.textContent = message;
-  document.body.append(alertContainerElement);
+export const showAlert = () => {
+
+  const errorTemplate = document.querySelector('#data-error').content.querySelector('.data-error');
+
+  const errorElement = errorTemplate.cloneNode(true);
+
+  document.body.append(errorElement);
 
   setTimeout(() => {
-    alertContainerElement.remove();
+    errorElement.remove();
   }, ALERT_SHOW_TIME);
 };
+
 
 export const debounce = (callback, timeoutDelay = 500) => {
   let timeoutId;

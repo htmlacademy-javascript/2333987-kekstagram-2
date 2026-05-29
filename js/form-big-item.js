@@ -16,8 +16,9 @@ function hideFormBigItem () {
   openDialogElement.classList.add('hidden');
   bodyElement.classList.remove('modal-open');
   document.removeEventListener('keydown', onDocumentKeydown);
-  if (document.querySelector('.comments-loader') !== null) {
-    document.querySelector('.comments-loader').remove();
+  const loadMoreButton = document.querySelector('.social__comments-loader');
+  if (loadMoreButton) {
+    loadMoreButton.classList.remove('hidden');
   }
 }
 

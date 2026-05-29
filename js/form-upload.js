@@ -114,27 +114,33 @@ export const initFormUpload = (onStartValidator, onSuccessUpload) => {
   onStartValidator();
   uploadFormElement.addEventListener('submit', (evt) => {
     evt.preventDefault();
-    if(validateValues()) {
+    if (validateValues()) {
       blockSubmitButton();
       sendData(new FormData(evt.target))
-        .then(onSuccessUpload)
-        .then(() => openMessageBox(SUCCESS_TYPE_MESSAGE))
-        .catch(
-          () => {
-            openMessageBox(ERROR_TYPE_MESSAGE);
-          }
-        )
-        .finally(unblockSubmitButton);
+        .then(() => {
+          onSuccessUpload();
+          openMessageBox(SUCCESS_TYPE_MESSAGE);
+        })
+        .catch(() => {
+          openMessageBox(ERROR_TYPE_MESSAGE);
+        })
+        .finally(() => {
+          unblockSubmitButton();
+        });
     }
   });
   uploadButtonElement.addEventListener('change', () => {
     const file = uploadButtonElement.files[0];
+    if (!file) {
+      return;
+    }
     const fileName = file.name.toLowerCase();
     const matches = FILE_TYPES.some((extension) => fileName.endsWith(extension));
     if (matches) {
-      imagePreviewElement.src = URL.createObjectURL(file);
+      const fileUrl = URL.createObjectURL(file);
+      imagePreviewElement.src = fileUrl;
       effectsPreviewElement.forEach((effect) => {
-        effect.style.backgroundImage = `url('${URL.createObjectURL(file)}')`;
+        effect.style.backgroundImage = `url('${fileUrl}')`;
       });
       showFormUpload();
     }

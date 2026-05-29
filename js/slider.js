@@ -63,8 +63,11 @@ const hideSlider = () => {
   sliderContainerElement.classList.add('hidden');
 };
 
+let currentEffect = defaultEffect;
+
 const setSlider = (nameEffect, chosenEffect) => {
   imagePreviewElement.className = `effects__preview--${nameEffect}`;
+  currentEffect = chosenEffect;
   sliderElement.noUiSlider.updateOptions({
     range: {
       min: chosenEffect.min,
@@ -73,10 +76,8 @@ const setSlider = (nameEffect, chosenEffect) => {
     start: chosenEffect.max,
     step: chosenEffect.step
   });
-  sliderElement.noUiSlider.on('update', () => {
-    valueElement.value = sliderElement.noUiSlider.get(true);
-    imagePreviewElement.style.filter = `${chosenEffect.style}(${valueElement.value}${chosenEffect.unit})`;
-  });
+  valueElement.value = sliderElement.noUiSlider.get(true);
+  imagePreviewElement.style.filter = `${chosenEffect.style}(${valueElement.value}${chosenEffect.unit})`;
 };
 
 export const resetSlider = () => {
@@ -92,6 +93,10 @@ export const destroySlider = () => {
 };
 
 export const initSlider = () => {
+  if (sliderElement.noUiSlider) {
+    sliderElement.noUiSlider.destroy();
+  }
+
   noUiSlider.create(sliderElement, {
     range: {
       min: defaultEffect.min,
@@ -111,6 +116,15 @@ export const initSlider = () => {
         return parseFloat(value);
       },
     },
+  });
+  sliderElement.noUiSlider.on('update', () => {
+    const currentValue = sliderElement.noUiSlider.get(true);
+    valueElement.value = currentValue;
+    if (currentEffect.name === 'none') {
+      imagePreviewElement.style.filter = '';
+    } else {
+      imagePreviewElement.style.filter = `${currentEffect.style}(${currentValue}${currentEffect.unit})`;
+    }
   });
   hideSlider();
   resetSlider();

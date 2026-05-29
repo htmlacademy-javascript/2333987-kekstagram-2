@@ -2,7 +2,24 @@ const COMMENT_COUNT = 5;
 const AVATAR_SIZE = 35;
 
 const commentListElement = document.querySelector('.social__comments');
-const counterRenderedCommentsElement = document.querySelector('.comments-current');
+const counterRenderedCommentsElement = document.querySelector('.social__comment-shown-count')
+  || document.querySelector('.comments-current');
+
+let currentLoadMoreHandler = null;
+
+const showLoadMoreButton = () => {
+  const currentButton = document.querySelector('.social__comments-loader');
+  if (currentButton) {
+    currentButton.classList.remove('hidden');
+  }
+};
+
+const hideLoadMoreButton = () => {
+  const currentButton = document.querySelector('.social__comments-loader');
+  if (currentButton) {
+    currentButton.classList.add('hidden');
+  }
+};
 
 const createComment = (comment) => {
   const {avatar, name, message} = comment;
@@ -33,21 +50,6 @@ const addComment = (comment) => {
 
 const calcCounterLoadedComments = (marker, length) => marker > length ? length : marker;
 
-const createLoadMoreButton = () => {
-  const loadMoreButtonElement = document.createElement('button');
-  loadMoreButtonElement.setAttribute('type', 'button');
-  loadMoreButtonElement.classList.add('social__comments-loader');
-  loadMoreButtonElement.classList.add('comments-loader');
-  loadMoreButtonElement.textContent = 'Загрузить еще';
-  commentListElement.after(loadMoreButtonElement);
-};
-
-const hideLoadMoreButton = () => {
-  if (document.querySelector('.comments-loader') !== null) {
-    document.querySelector('.comments-loader').classList.add('hidden');
-  }
-};
-
 const onLoadMoreButtonClick = (items) => (evt) => {
   evt.preventDefault();
 
@@ -57,9 +59,11 @@ const onLoadMoreButtonClick = (items) => (evt) => {
   });
   marker += COMMENT_COUNT;
 
-  counterRenderedCommentsElement.textContent = calcCounterLoadedComments(marker, items.length);
+  if (counterRenderedCommentsElement) {
+    counterRenderedCommentsElement.textContent = calcCounterLoadedComments(marker, items.length);
+  }
 
-  if(marker >= items.length) {
+  if (marker >= items.length) {
     hideLoadMoreButton();
   }
 };
@@ -69,24 +73,47 @@ const renderVisibleComments = (comments) => {
     addComment(comment);
   });
   hideLoadMoreButton();
-  counterRenderedCommentsElement.textContent = comments.length;
+  if (counterRenderedCommentsElement) {
+    counterRenderedCommentsElement.textContent = comments.length;
+  }
 };
 
 const renderInvisibleComments = (comments) => {
   comments.slice(0, COMMENT_COUNT).forEach((comment) => {
     addComment(comment);
   });
-  counterRenderedCommentsElement.textContent = calcCounterLoadedComments(commentListElement.childNodes.length, comments.length);
-  if (document.querySelector('.comments-loader') === null) {
-    createLoadMoreButton();
+
+  if (counterRenderedCommentsElement) {
+    counterRenderedCommentsElement.textContent = calcCounterLoadedComments(commentListElement.childNodes.length, comments.length);
   }
-  document.querySelector('.comments-loader').addEventListener('click', onLoadMoreButtonClick(comments));
+
+  const originalButton = document.querySelector('.social__comments-loader');
+  if (originalButton) {
+    originalButton.classList.add('comments-loader');
+  }
+
+  showLoadMoreButton();
+
+  if (originalButton && currentLoadMoreHandler) {
+    originalButton.removeEventListener('click', currentLoadMoreHandler);
+  }
+
+  currentLoadMoreHandler = onLoadMoreButtonClick(comments);
+
+  if (originalButton) {
+    originalButton.addEventListener('click', currentLoadMoreHandler);
+  }
 };
 
 const renderComments = (comments) => {
   commentListElement.innerHTML = '';
 
-  if(comments.length <= COMMENT_COUNT) {
+  const originalButton = document.querySelector('.social__comments-loader');
+  if (originalButton && currentLoadMoreHandler) {
+    originalButton.removeEventListener('click', currentLoadMoreHandler);
+  }
+
+  if (comments.length <= COMMENT_COUNT) {
     renderVisibleComments(comments);
   } else {
     renderInvisibleComments(comments);
@@ -97,12 +124,39 @@ export const renderItemDetails = (item, outputContainer) => {
   const {comments, description, likes, url} = item;
 
   const bigImage = outputContainer.querySelector('.big-picture__img img');
-  bigImage.src = url;
-  bigImage.alt = description;
+  if (bigImage) {
+    bigImage.src = url;
+    bigImage.alt = description;
+  }
 
-  outputContainer.querySelector('.social__caption').textContent = description;
-  outputContainer.querySelector('.likes-count').textContent = likes;
-  outputContainer.querySelector('.comments-count').textContent = comments.length;
+  const captionElement = outputContainer.querySelector('.social__caption');
+  if (captionElement) {
+    captionElement.textContent = description;
+  }
+
+  const likesElement = outputContainer.querySelector('.likes-count');
+  if (likesElement) {
+    likesElement.textContent = likes;
+  }
+
+  const totalCountElement = outputContainer.querySelector('.social__comment-total-count')
+    || outputContainer.querySelector('.comments-count');
+  if (totalCountElement) {
+    totalCountElement.textContent = comments.length;
+  }
+
+  const shownCountElement = outputContainer.querySelector('.social__comment-shown-count');
+  if (shownCountElement) {
+    shownCountElement.textContent = Math.min(5, comments.length);
+  }
+
+  const anyLoadMoreButton = outputContainer.querySelector('.social__comments-loader')
+    || outputContainer.querySelector('.comments-loader');
+
+  if (anyLoadMoreButton) {
+
+    anyLoadMoreButton.classList.add('social__comments-loader', 'comments-loader');
+  }
 
   renderComments(comments);
 };
