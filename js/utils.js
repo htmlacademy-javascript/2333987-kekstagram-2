@@ -1,11 +1,11 @@
 const ALERT_SHOW_TIME = 5000;
 
-export const checkLength = (array, maxLength) => array.length <= maxLength;
+export const checkLength = (hashtags, maxLength) => hashtags.length <= maxLength;
 
-export const checkRepeats = (array) => {
-  const itemsInUpperCase = array.map((item) => item.toUpperCase());
-  const arrayNoRepeats = new Set(itemsInUpperCase);
-  return arrayNoRepeats.size === itemsInUpperCase.length;
+export const checkRepeats = (hashtags) => {
+  const itemsInUpperCase = hashtags.map((item) => item.toUpperCase());
+  const hashtagsNoRepeats = new Set(itemsInUpperCase);
+  return hashtagsNoRepeats.size === itemsInUpperCase.length;
 };
 
 export const isEscapeKey = (evt) => evt.key === 'Escape';
