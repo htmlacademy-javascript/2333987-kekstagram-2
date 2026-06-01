@@ -5,7 +5,7 @@ const commentListElement = document.querySelector('.social__comments');
 const counterRenderedCommentsElement = document.querySelector('.social__comment-shown-count')
   || document.querySelector('.comments-current');
 
-let currentLoadMoreHandler = null;
+let currentLoadMoreClick = null;
 
 const showLoadMoreButton = () => {
   const currentButton = document.querySelector('.social__comments-loader');
@@ -94,14 +94,14 @@ const renderInvisibleComments = (comments) => {
 
   showLoadMoreButton();
 
-  if (originalButton && currentLoadMoreHandler) {
-    originalButton.removeEventListener('click', currentLoadMoreHandler);
+  if (originalButton && currentLoadMoreClick) {
+    originalButton.removeEventListener('click', currentLoadMoreClick);
   }
 
-  currentLoadMoreHandler = onLoadMoreButtonClick(comments);
+  currentLoadMoreClick = onLoadMoreButtonClick(comments);
 
   if (originalButton) {
-    originalButton.addEventListener('click', currentLoadMoreHandler);
+    originalButton.addEventListener('click', currentLoadMoreClick);
   }
 };
 
@@ -109,8 +109,8 @@ const renderComments = (comments) => {
   commentListElement.innerHTML = '';
 
   const originalButton = document.querySelector('.social__comments-loader');
-  if (originalButton && currentLoadMoreHandler) {
-    originalButton.removeEventListener('click', currentLoadMoreHandler);
+  if (originalButton && currentLoadMoreClick) {
+    originalButton.removeEventListener('click', currentLoadMoreClick);
   }
 
   if (comments.length <= COMMENT_COUNT) {
